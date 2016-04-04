@@ -1,0 +1,7 @@
+<resources>
+
+    <style name="Favorite_Movies_Style">
+        <item name="android:choiceMode">singleChoice</item>
+    </style>
+
+</resources>
