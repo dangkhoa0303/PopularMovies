@@ -1,12 +1,17 @@
 package com.example.android.popularmovies.Activities;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +29,8 @@ import com.example.android.popularmovies.BuildConfig;
 import com.example.android.popularmovies.Network.CheckNetworkConnection;
 import com.example.android.popularmovies.Properties.MovieProperties;
 import com.example.android.popularmovies.R;
+import com.example.android.popularmovies.data.MoviesContract;
+import com.example.android.popularmovies.service.FetchMoviesService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,48 +48,91 @@ import java.util.ArrayList;
  * Created by Dell on 11/13/2015.
  */
 
-/*
-onCreate will launch first, next is onCreateView, and then onStart is called.
- */
-
 public class MoviesFragment extends Fragment {
 
-    private GridViewAdapter adapter; // custom adapter for GridView
-    public static ArrayList<MovieProperties> list_movie = new ArrayList<>(); // list_movies contains all the movies' information
+    private GridViewAdapter adapter;
+    private ArrayList<MovieProperties> list_movie;
     private GridView gridView;
-    public String sort_by_popularity = "popularity.desc", sort_by_rates = "vote_average.desc";
-    public String sort_by;
-    private String MOVIE_KEY = "movie"; // used for saved instance
+    private CustomSwipeRefreshLayout mSwipeRefreshLayout;
+
+    private static String sort_by_popularity = "popularity.desc", sort_by_rates = "vote_average.desc";
+    private String sort_by;
+
+    private static String MOVIE_KEY = "movie"; // used for saved instance
+    private static String SORT_KEY = "SORT_ORDER";
+
     private CheckNetworkConnection checkNetworkConnection;
-    private ProgressBar progressBar;
-    public boolean sortCheck;
-    public String SORT_KEY = "SORT_ORDER";
+    private MoviesServiceReceiver receiver;
 
     public interface CallBack {
         public void onItemSelected(MovieProperties movie);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        checkNetworkConnection = new CheckNetworkConnection(getActivity());
-        // if don't initialize adpater in onCreate, all the methods relating to adapter will cause error because if null object (adapter)
-        adapter = new GridViewAdapter(getActivity(), new ArrayList<MovieProperties>());
-
-        if (savedInstanceState != null) {
-            list_movie = savedInstanceState.getParcelableArrayList(MOVIE_KEY);
-            adapter.addAll(list_movie);
-        }
-
-        setHasOptionsMenu(true);
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(MOVIE_KEY, list_movie);
+        outState.putString(SORT_KEY, sort_by);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(MOVIE_KEY, list_movie); // saved the list of movies on the first time run with INTERNET CONNECTION
-        outState.putBoolean(SORT_KEY, sortCheck);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        IntentFilter intentFilter = new IntentFilter(MoviesServiceReceiver.MOVIES_LIST_RECEIVER);
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        receiver = new MoviesServiceReceiver();
+        getContext().registerReceiver(receiver, intentFilter);
+
+        checkNetworkConnection = new CheckNetworkConnection(getActivity());
+        // if don't initialize adapter in onCreate, all the methods relating to adapter will cause error because if null object (adapter)
+        adapter = new GridViewAdapter(getActivity(), new ArrayList<MovieProperties>());
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(MOVIE_KEY)) {
+            list_movie = savedInstanceState.getParcelableArrayList(MOVIE_KEY);
+            sort_by = savedInstanceState.getString(SORT_KEY);
+        } else {
+            list_movie = new ArrayList<>();
+        }
+        setHasOptionsMenu(true);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_main_new, container, false);
+
+        gridView = (GridView) view.findViewById(R.id.gridView);
+        mSwipeRefreshLayout = (CustomSwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.red);
+        mSwipeRefreshLayout.setGridView(gridView);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh(sort_by);
+            }
+        });
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ((CallBack) getActivity())
+                        .onItemSelected(list_movie.get(position));
+            }
+        });
+        if (list_movie.size()==0 && savedInstanceState==null) {
+            sort_by = sort_by_popularity;
+            refresh(sort_by);
+        } else {
+            updateUI(list_movie, adapter);
+        }
+        return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        getContext().unregisterReceiver(receiver);
+        super.onDestroy();
     }
 
     @Override
@@ -97,25 +147,19 @@ public class MoviesFragment extends Fragment {
         int id = item.getItemId();
         if (id == R.id.most_popular) {
             sort_by = sort_by_popularity;
-            UpdateTask(sort_by);
-            sortCheck = true;
+            refresh(sort_by);
         }
-        if (id == R.id.highest_rated) {
-            sort_by = sort_by_rates;
-            UpdateTask(sort_by);
-            sortCheck = false;
-        }
+
         return super.onOptionsItemSelected(item);
     }
 
-    public void UpdateTask(String sort_by) {
-        if (checkNetworkConnection.isNetworkAvailable()) { // if there is internet connection, execute
-            MovieTask movieTask = new MovieTask();
-            progressBar.setVisibility(View.VISIBLE);
-            movieTask.setProgressBar(progressBar);
-            movieTask.execute(sort_by);
-        } else { // otherwise, show a dialog to announce user about internet connection
-
+    public void refresh(String sort_by) {
+        if (checkNetworkConnection.isNetworkAvailable()) {
+            mSwipeRefreshLayout.setRefreshing(true);
+            Intent intent = new Intent(getActivity(), FetchMoviesService.class);
+            intent.putExtra(FetchMoviesService.SORT_BY, sort_by);
+            getContext().startService(intent);
+        } else {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
             alertDialog
                     .setTitle("Oops! No internet connection!")
@@ -126,218 +170,29 @@ public class MoviesFragment extends Fragment {
                         }
                     })
                     .show();
+            //mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
-
-        gridView = (GridView) view.findViewById(R.id.gridView);
-
-        progressBar = (ProgressBar) view.findViewById(R.id.Progressbar);
-        progressBar.setVisibility(View.VISIBLE);
-        progressBar.setProgress(0);
-
+    private void updateUI(ArrayList<MovieProperties> list, GridViewAdapter adapter) {
+        if (adapter != null) {
+            adapter.clear();
+        }
+        adapter.addAll(list);
         gridView.setAdapter(adapter);
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(), list_movie.get(position).getTitle(), Toast.LENGTH_SHORT).show();
-
-                ((CallBack) getActivity())
-                        .onItemSelected(list_movie.get(position));
-            }
-        });
-
-        if (list_movie.size() == 0) {
-            if (savedInstanceState != null && savedInstanceState.containsKey(SORT_KEY)) {
-                if (savedInstanceState.getBoolean(SORT_KEY)) {
-                    sort_by = sort_by_popularity;
-                    UpdateTask(sort_by);
-                } else {
-                    sort_by = sort_by_rates;
-                    UpdateTask(sort_by);
-                }
-            } else {
-                sort_by = sort_by_popularity;
-                UpdateTask(sort_by);
-            }
-            //sortCheck = true;
-        } else {
-            adapter.notifyDataSetChanged();
-            progressBar.setVisibility(View.INVISIBLE);
-        }
-
-        return view;
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
-    public class MovieTask extends AsyncTask<String, Integer, ArrayList<MovieProperties>> {
-
-        ProgressBar bar;
-        public void setProgressBar(ProgressBar bar) {
-            this.bar = bar;
-        }
-
-        // this method is used to get information from the json string
-        protected ArrayList<MovieProperties> getDataFromJsonString(String jsonString) {
-            list_movie = new ArrayList<>();
-
-            String LIST = "results";
-            String TITLE = "original_title";
-            String OVERVIEW = "overview";
-            String POSTER_PATH = "poster_path";
-            String BACKDROP_PATH = "backdrop_path";
-            String VOTE_AVERAGE = "vote_average";
-            String VOTE_COUNT = "vote_count";
-            String RELEASE_DATE = "release_date";
-
-            String ID = "id";
-
-            try {
-                JSONObject theMovieDb = new JSONObject(jsonString);
-                JSONArray movies = theMovieDb.getJSONArray(LIST); // get the list of json objects
-
-                for (int i = 0; i < movies.length(); i++) {
-                    JSONObject movie = movies.getJSONObject(i);
-                    MovieProperties movieProperties = new MovieProperties();
-
-                    // set attributes for specific movie
-                    movieProperties.setTitle(movie.getString(TITLE));
-
-                    // some movies don't have overview
-                    if (!movie.getString(OVERVIEW).equals("null")) {
-                        movieProperties.setOverview(movie.getString(OVERVIEW));
-                    } else {
-                        movieProperties.setOverview("No content");
-                    }
-
-                    // set the complete url path for the poster of the movie
-                    String BASE_URL = "http://image.tmdb.org/t/p/";
-
-                    StringBuilder builder = new StringBuilder(BASE_URL);
-                    builder.append("w342/").append(movie.getString(POSTER_PATH));
-                    movieProperties.setPoster_path(builder.toString());
-
-                    StringBuilder builder1 = new StringBuilder(BASE_URL);
-                    builder1.append("w500/").append(movie.getString(BACKDROP_PATH));
-                    movieProperties.setBackdrop_path(builder1.toString());
-
-                    movieProperties.setVote_average(movie.getDouble(VOTE_AVERAGE));
-                    movieProperties.setVote_count(movie.getInt(VOTE_COUNT));
-
-                    movieProperties.setId(movie.getInt(ID));
-
-                    // some movies don't have release date
-                    if (!movie.getString(RELEASE_DATE).equals("null")) {
-                        movieProperties.setRelease_date(movie.getString(RELEASE_DATE));
-                    } else {
-                        movieProperties.setRelease_date("Unknown");
-                    }
-                    list_movie.add(movieProperties);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return list_movie;
-        }
+    public class MoviesServiceReceiver extends BroadcastReceiver {
+        public static final String MOVIES_LIST_RECEIVER = "com.example.android.movies";
 
         @Override
-        /**
-         * do in background
-         * get json string
-         * return a list of movies' information
-         */
-        protected ArrayList<MovieProperties> doInBackground(String... params) {
-
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            String json = null;
-
-            try {
-
-                String URL_BASE = "http://api.themoviedb.org/3/discover/movie?";
-                String SORT = "sort_by";
-                String API = "api_key";
-
-                Uri uriBuilder = Uri.parse(URL_BASE).buildUpon()
-                        .appendQueryParameter(SORT, params[0])
-                        .appendQueryParameter(API, BuildConfig.OPEN_API)
-                        .build();
-
-                URL url = new URL(uriBuilder.toString());
-
-                Log.v("HTPP::::", uriBuilder.toString());
-
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-
-                if (inputStream == null) {
-                    // do nothing here
-                    return null;
-                }
-
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                StringBuilder builder = new StringBuilder();
-
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line + "\n");
-                }
-
-                json = builder.toString();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+        public void onReceive(Context context, Intent intent) {
+            if (list_movie != null) {
+                list_movie.clear();
             }
-            return getDataFromJsonString(json);
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-
-            // set progress for progressBar
-            if (this.bar != null) {
-                bar.setProgress(values[0]);
-            }
-        }
-
-        @Override
-        /**
-         * after executing do in background, set movies posters for the GridView using custom adapter
-         */
-        protected void onPostExecute(ArrayList<MovieProperties> movieProperties) {
-            super.onPostExecute(movieProperties);
-
-            list_movie = movieProperties;
-
-            // if list is not empty, clear the previous data in the adapter and replaced with new one
-            if (movieProperties != null) {
-                adapter.clear();
-                for (MovieProperties movie : movieProperties) {
-                    adapter.add(movie);
-                }
-            }
-            progressBar.setVisibility(View.INVISIBLE);
+            list_movie = intent.getParcelableArrayListExtra(FetchMoviesService.KEY_RESPONSE);
+            updateUI(list_movie, adapter);
         }
     }
 }

@@ -6,14 +6,4 @@
         android:title="@string/most_popular"
         app:showAsAction="ifRoom|withText" />
 
-    <item
-        android:id="@+id/highest_rated"
-        android:title="@string/highest_rated"
-        app:showAsAction="ifRoom|withText" />
-
-    <item
-        android:id="@+id/settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
 </menu>

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -78,6 +79,8 @@ public class DetailFragment extends Fragment {
     private ProgressBar progressBar;
 
     // using Butter Knife to cast
+    @InjectView(R.id.collapseToolBar)
+    CollapsingToolbarLayout titleToolBar;
     @InjectView(R.id.title_text)
     TextView title;
     @InjectView(R.id.release_date_text)
@@ -93,7 +96,7 @@ public class DetailFragment extends Fragment {
     ImageView backdrop;
 
     @InjectView(R.id.mark_favorite)
-    RatingBar mark_favorite;
+    ImageView mark_favorite;
     @InjectView(R.id.ratingBar)
     RatingBar rateBar;
 
@@ -111,11 +114,14 @@ public class DetailFragment extends Fragment {
         user_rating.setText(String.valueOf(movie.getVote_average()) + "/10.0");
         overview.setText(movie.getOverview());
 
+        titleToolBar.setTitle(movie.getTitle());
+
         Picasso.with(getContext())
                 .load(movie.getBackdrop_path())
                 .placeholder(R.drawable.movie_icon)
                 .error(R.drawable.movie_icon)
                 .into(backdrop);
+        backdrop.setAlpha(0.8f);
 
         Picasso.with(getContext())
                 .load(movie.getPoster_path())
@@ -172,7 +178,7 @@ public class DetailFragment extends Fragment {
 
         }
         // create view for this fragment
-        View view = inflater.inflate(R.layout.detail_fragment, container, false);
+        View view = inflater.inflate(R.layout.detail_fragment_new, container, false);
 
         adapter = new ReviewAdapter(getContext(), new ArrayList<Review>());
         checkNetworkConnection = new CheckNetworkConnection(getContext());
@@ -290,22 +296,38 @@ public class DetailFragment extends Fragment {
         // if yes, set the star button to be pressed
         try {
             if (currentMovie(movie).getCount() == 1) {
-                mark_favorite.setRating(1.0f);
+                mark_favorite.setImageResource(R.drawable.like_icon);
                 check_marked_favorite = true;
             }
         } finally {
             currentMovie(movie).close();
         }
 
-        mark_favorite.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+//        mark_favorite.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+//            @Override
+//            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+//                if (fromUser && rating == 1.0f) {
+//                    Toast.makeText(getContext(), "Marked as favorite movie", Toast.LENGTH_SHORT).show();
+//                    Uri uri_insert = getContext().getContentResolver().insert(authority, insert(movie));
+//                } else {
+//                    Toast.makeText(getContext(), "Unmarked as favorite movie", Toast.LENGTH_SHORT).show();
+//                    int movie_deleted = delete(movie);
+//                }
+//            }
+//        });
+        mark_favorite.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                if (fromUser && rating == 1.0f) {
-                    Toast.makeText(getContext(), "Marked as favorite movie", Toast.LENGTH_SHORT).show();
-                    Uri uri_insert = getContext().getContentResolver().insert(authority, insert(movie));
-                } else {
-                    Toast.makeText(getContext(), "Unmarked as favorite movie", Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                if (check_marked_favorite) {
+                    mark_favorite.setImageResource(R.drawable.not_like_icon);
+                    Toast.makeText(getContext(), "Unliked", Toast.LENGTH_SHORT).show();
                     int movie_deleted = delete(movie);
+                    check_marked_favorite = false;
+                } else {
+                    mark_favorite.setImageResource(R.drawable.like_icon);
+                    Toast.makeText(getContext(), "Liked", Toast.LENGTH_SHORT).show();
+                    Uri uri_insert = getContext().getContentResolver().insert(authority, insert(movie));
+                    check_marked_favorite = true;
                 }
             }
         });
@@ -455,6 +477,7 @@ public class DetailFragment extends Fragment {
             try {
 
                 URL url_trailer = new URL("http://api.themoviedb.org/3/movie/" + params[0] + "/videos?api_key=" + BuildConfig.OPEN_API);
+                //Log.i("API", url_trailer.toString());
 
                 urlConnection_trailer = (HttpURLConnection) url_trailer.openConnection();
                 urlConnection_trailer.setRequestMethod("GET");
@@ -570,7 +593,7 @@ public class DetailFragment extends Fragment {
 
             try {
 
-                URL url_review = new URL("http://api.themoviedb.org/3/movie/" + params[0] + "/reviews?api_key=" + BuildConfig.OPEN_API);
+                URL url_review = new URL("https://api.themoviedb.org/3/movie/" + params[0] + "/reviews?api_key=" + BuildConfig.OPEN_API);
                 urlConnection_review = (HttpURLConnection) url_review.openConnection();
                 urlConnection_review.setRequestMethod("GET");
                 urlConnection_review.connect();

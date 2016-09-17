@@ -19,6 +19,7 @@
             </intent-filter>
         </activity>
         <activity
+            android:theme="@style/DetailTheme"
             android:name=".Activities.DetailActivity"
             android:parentActivityName=".Activities.MainActivity"></activity>
 
@@ -29,6 +30,9 @@
         <activity android:name=".Activities.FavoriteMoviesActivity"
             android:label="Favorite Movies"
             android:parentActivityName=".Activities.MainActivity"></activity>
+
+        <service android:name=".service.FetchMoviesService"/>
+
     </application>
 
 </manifest>

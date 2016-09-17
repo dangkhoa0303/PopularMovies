@@ -18,7 +18,7 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        getSupportActionBar().setElevation(0f);
+        //getSupportActionBar().setElevation(0f);
 
         if (savedInstanceState == null) {
 
