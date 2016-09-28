@@ -6,6 +6,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,12 +21,12 @@ import java.util.ArrayList;
 /**
  * Created by Dell on 11/13/2015.
  */
-public class GridViewAdapter extends ArrayAdapter {
+public class MoviesAdapter extends ArrayAdapter {
 
     private Context context;
     private ArrayList<MovieProperties> movies;
 
-    public GridViewAdapter(Context context, ArrayList<MovieProperties> movies) {
+    public MoviesAdapter(Context context, ArrayList<MovieProperties> movies) {
         super(context, R.layout.list_movie_item, movies);
         this.context = context;
         this.movies = movies;
@@ -33,7 +34,11 @@ public class GridViewAdapter extends ArrayAdapter {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(this.context).inflate(R.layout.list_movie_item, parent, false);
+            if (position == 0) {
+                convertView = LayoutInflater.from(this.context).inflate(R.layout.list_movie_item_special, parent, false);
+            } else {
+                convertView = LayoutInflater.from(this.context).inflate(R.layout.list_movie_item, parent, false);
+            }
         }
 
         ImageView thumbnail = (ImageView) convertView.findViewById(R.id.item_movie_thumbnail);
@@ -43,8 +48,7 @@ public class GridViewAdapter extends ArrayAdapter {
 
         Picasso.with(context)
                 .load(movies.get(position).getPoster_path())
-                .error(R.drawable.movie_icon)
-                .resize(535, 700)
+                .error(R.drawable.app_movie_icon)
                 .into(thumbnail);
 
         title.setText(movies.get(position).getTitle());

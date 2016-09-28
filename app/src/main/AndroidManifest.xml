@@ -19,19 +19,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:theme="@style/DetailTheme"
             android:name=".Activities.DetailActivity"
-            android:parentActivityName=".Activities.MainActivity"></activity>
+            android:parentActivityName=".Activities.MainActivity"
+            android:theme="@style/DetailTheme"></activity>
 
         <provider
             android:name=".data.MovieProvider"
             android:authorities="com.example.android.popularmovies" />
 
-        <activity android:name=".Activities.FavoriteMoviesActivity"
+        <activity
+            android:name=".Activities.FavoriteMoviesActivity"
             android:label="Favorite Movies"
             android:parentActivityName=".Activities.MainActivity"></activity>
 
-        <service android:name=".service.FetchMoviesService"/>
+        <service android:name=".service.FetchMoviesService" />
+
+        <service android:name=".service.FetchUpComingMoviesService" />
 
     </application>
 

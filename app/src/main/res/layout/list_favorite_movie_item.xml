@@ -3,7 +3,7 @@
     android:layout_height="90dp"
     android:background="@drawable/touch_selector"
     android:orientation="horizontal"
-    android:padding="5dp">
+    android:padding="16dp">
 
     <ImageView
         android:id="@+id/poster_imageView"
@@ -45,8 +45,6 @@
             android:text="Vote Average"
             android:textSize="14sp" />
 
-
     </LinearLayout>
-
 
 </LinearLayout>

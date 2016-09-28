@@ -4,10 +4,18 @@
     <!-- strings for menu -->
     <string name="most_popular">Most popular</string>
     <string name="highest_rated">Highest rated</string>
+    <string name="movies_coming_out">Movies Coming</string>
     <string name="action_settings">Settings</string>
+
+    <string name="see_more">See more...</string>
+
+    <string name="popular_movies">Popular</string>
+    <string name="upcoming_movies">Upcoming</string>
     <string name="favorite_movies">Favorite</string>
 
     <!-- Button trailer and Reviews -->
     <string name="trailer_button" translatable="false">Trailer</string>
     <string name="review_button" translatable="false">Reviews</string>
+
+    <string name="no_internet">Oops! No internet connection!</string>
 </resources>

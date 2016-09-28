@@ -4,27 +4,28 @@ import android.content.Context;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.widget.GridView;
+import android.widget.ListView;
 
 /**
  * Created by Dell on 6/7/2016.
  */
 public class CustomSwipeRefreshLayout extends SwipeRefreshLayout {
-    private GridView mGridView;
+    private ListView mListView;
 
     public CustomSwipeRefreshLayout(Context context) {
         super(context);
     }
 
-    public void setGridView(GridView gridView) {
-        mGridView = gridView;
+    public void setListView(ListView listView) {
+        mListView = listView;
     }
 
     @Override
     public boolean canChildScrollUp() {
-        if (mGridView==null) {
+        if (mListView==null) {
             return true;
         }
-        return mGridView.canScrollVertically(-100);
+        return mListView.canScrollVertically(-100);
     }
 
     public CustomSwipeRefreshLayout(Context context, AttributeSet attrs) {

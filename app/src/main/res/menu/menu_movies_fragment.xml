@@ -6,4 +6,9 @@
         android:title="@string/most_popular"
         app:showAsAction="ifRoom|withText" />
 
+    <item
+        android:id="@+id/movies_coming"
+        android:title="@string/movies_coming_out"
+        app:showAsAction="collapseActionView" />
+
 </menu>

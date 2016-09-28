@@ -54,8 +54,8 @@ public class FavoriteMoviesFragment extends Fragment implements LoaderManager.Lo
     public static final int COL_RELEASE_DATE = 8;
 
 
-    public static interface CallBack {
-        public void onListItemSelected(MovieProperties movie);
+    public interface FavoriteMoviesCallBack {
+        void onListItemSelected(MovieProperties movie);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class FavoriteMoviesFragment extends Fragment implements LoaderManager.Lo
                     movieProperties.setOverview(cursor.getString(cursor.getColumnIndex(MoviesContract.Movies.OVERVIEW)));
                     movieProperties.setVote_average(cursor.getDouble(cursor.getColumnIndex(MoviesContract.Movies.VOTE_AVERAGE)));
                     movieProperties.setVote_count(cursor.getInt(cursor.getColumnIndex(MoviesContract.Movies.VOTE_COUNT)));
-                    ((CallBack) getActivity()).onListItemSelected(movieProperties);
+                    ((FavoriteMoviesCallBack) getActivity()).onListItemSelected(movieProperties);
                 }
                 mPosition = position;
             }

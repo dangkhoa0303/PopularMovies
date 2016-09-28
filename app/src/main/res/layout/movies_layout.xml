@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:nestedScrollingEnabled="false"
     android:background="@color/grey_200"
+    android:nestedScrollingEnabled="false"
     tools:context=".Activities.MainActivity">
 
     <com.example.android.popularmovies.Activities.CustomSwipeRefreshLayout
@@ -12,12 +12,12 @@
         android:layout_height="match_parent"
         android:clickable="true">
 
-        <GridView
-            android:id="@+id/gridView"
+        <ListView
+            android:id="@+id/listView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:numColumns="auto_fit"
-            android:outlineProvider="paddedBounds"></GridView>
+            android:numColumns="1"
+            android:dividerHeight="1dp"></ListView>
 
     </com.example.android.popularmovies.Activities.CustomSwipeRefreshLayout>
 

@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.example.android.popularmovies.Properties.MovieProperties;
 import com.example.android.popularmovies.R;
 
-public class FavoriteMoviesActivity extends AppCompatActivity implements FavoriteMoviesFragment.CallBack {
+public class FavoriteMoviesActivity extends AppCompatActivity implements FavoriteMoviesFragment.FavoriteMoviesCallBack {
 
     private boolean mTwoPane;
 
@@ -53,13 +53,9 @@ public class FavoriteMoviesActivity extends AppCompatActivity implements Favorit
         else {
 
             Intent intent = new Intent(this, DetailActivity.class);
-
             Bundle bundle = new Bundle();
-
             bundle.putParcelable("Movie_Package_Intent", movie);
-
             intent.putExtra("Package", bundle);
-
             startActivity(intent);
         }
     }
