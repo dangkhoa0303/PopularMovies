@@ -1,15 +1,12 @@
-package com.example.android.popularmovies.service;
+package com.example.android.popularmovies.Services;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 
-import com.example.android.popularmovies.Activities.MostPopularMoviesFragment;
-import com.example.android.popularmovies.Activities.UpComingMoviesFragment;
+import com.example.android.popularmovies.UI.MostPopularMoviesFragment;
 import com.example.android.popularmovies.BuildConfig;
 import com.example.android.popularmovies.Properties.MovieProperties;
-import com.example.android.popularmovies.Util;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,40 +21,37 @@ import java.net.URL;
 import java.util.ArrayList;
 
 /**
- * Created by Dell on 9/18/2016.
+ * Created by Dell on 8/11/2016.
  */
-public class FetchUpComingMoviesService extends IntentService {
-
-    public static String NEW_MOVIES = "NEW_MOVIES";
-    public static String KEY_RESPONSE_NEW_MOVIES = "key_response_new_movies";
+public class FetchMoviesService extends IntentService {
+    public static String SORT_BY = "SORT_BY";
+    public static String KEY_RESPONSE_POPULAR_MOVIES = "key_response_popular_movies";
     private ArrayList<MovieProperties> list_movie;
 
-    public FetchUpComingMoviesService() {
-        super("NewMovies");
+    public FetchMoviesService() {
+        super("PopularMovies");
         list_movie = new ArrayList<>();
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        String type = intent.getStringExtra(SORT_BY);
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String json = null;
         try {
             String URL_BASE = "https://api.themoviedb.org/3/discover/movie?";
-            String PRIMARY_RELEASE_DATE_GTE = "primary_release_date.gte";
-            String PRIMARY_RELEASE_DATE_LTE = "primary_release_date.lte";
+            String SORT = "sort_by";
             String API = "api_key";
 
-            Uri uriBuilder = Uri.parse(URL_BASE).buildUpon()
-                    .appendQueryParameter(PRIMARY_RELEASE_DATE_GTE, Util.getCurrentDate())
-                    .appendQueryParameter(PRIMARY_RELEASE_DATE_LTE, Util.getNextMonthDate())
+            Uri uriBuilder = Uri.parse(URL_BASE)
+                    .buildUpon()
+                    .appendQueryParameter(SORT, type)
                     .appendQueryParameter(API, BuildConfig.OPEN_API)
                     .build();
 
             URL url = new URL(uriBuilder.toString());
-
-            Log.i("request new", url.toString());
 
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
@@ -101,8 +95,8 @@ public class FetchUpComingMoviesService extends IntentService {
 
         Intent broadcastIntent = new Intent();
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.setAction(UpComingMoviesFragment.NewMoviesServiceReceiver.NEW_MOVIES_LIST_RECEIVER);
-        broadcastIntent.putParcelableArrayListExtra(KEY_RESPONSE_NEW_MOVIES, list_movie);
+        broadcastIntent.setAction(MostPopularMoviesFragment.PopularMoviesServiceReceiver.POPULAR_MOVIES_LIST_RECEIVER);
+        broadcastIntent.putParcelableArrayListExtra(KEY_RESPONSE_POPULAR_MOVIES, list_movie);
         sendBroadcast(broadcastIntent);
     }
 

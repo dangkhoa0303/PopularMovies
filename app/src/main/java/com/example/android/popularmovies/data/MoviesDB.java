@@ -1,10 +1,10 @@
-package com.example.android.popularmovies.data;
+package com.example.android.popularmovies.Data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.android.popularmovies.data.MoviesContract.Movies;
+import com.example.android.popularmovies.Data.MoviesContract.Movies;
 
 /**
  * Created by Dell on 11/30/2015.

@@ -3,7 +3,7 @@
     <!-- colors for action bar including primary and primaryDark -->
     <color name="colorPrimary">#f44336</color>
     <color name="colorPrimaryDark">#d32f2f</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">@color/white</color>
 
         <!-- color for title -->
         <color name="title_color">#2980b9</color>

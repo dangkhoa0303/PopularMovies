@@ -9,7 +9,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.popularmovies.Activities.FavoriteMoviesFragment;
+import com.example.android.popularmovies.UI.FavoriteMoviesFragment;
 import com.example.android.popularmovies.R;
 import com.squareup.picasso.Picasso;
 

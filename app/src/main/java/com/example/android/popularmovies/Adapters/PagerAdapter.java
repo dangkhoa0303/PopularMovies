@@ -4,9 +4,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.example.android.popularmovies.Activities.FavoriteMoviesFragment;
-import com.example.android.popularmovies.Activities.MostPopularMoviesFragment;
-import com.example.android.popularmovies.Activities.UpComingMoviesFragment;
+import com.example.android.popularmovies.UI.FavoriteMoviesFragment;
+import com.example.android.popularmovies.UI.MostPopularMoviesFragment;
+import com.example.android.popularmovies.UI.UpComingMoviesFragment;
 
 /**
  * Created by Dell on 9/18/2016.

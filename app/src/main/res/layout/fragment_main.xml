@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:nestedScrollingEnabled="false"
-    tools:context=".Activities.MainActivity">
+    tools:context=".UI.MainActivity">
 
     <GridView
         android:id="@+id/gridView"

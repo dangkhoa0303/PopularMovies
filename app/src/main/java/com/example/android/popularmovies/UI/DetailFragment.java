@@ -1,4 +1,4 @@
-package com.example.android.popularmovies.Activities;
+package com.example.android.popularmovies.UI;
 
 
 import android.app.AlertDialog;
@@ -24,11 +24,11 @@ import android.widget.Toast;
 
 import com.example.android.popularmovies.Adapters.ReviewAdapter;
 import com.example.android.popularmovies.BuildConfig;
-import com.example.android.popularmovies.Network.CheckNetworkConnection;
+import com.example.android.popularmovies.Data.MoviesContract;
 import com.example.android.popularmovies.Properties.MovieProperties;
 import com.example.android.popularmovies.Properties.Review;
 import com.example.android.popularmovies.R;
-import com.example.android.popularmovies.data.MoviesContract;
+import com.example.android.popularmovies.Util;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -69,8 +69,6 @@ public class DetailFragment extends Fragment {
     private String TrailerRequestURL = null;
     // adapter to populate the review list
     private ReviewAdapter adapter;
-    // use to check whether there is internet connection
-    private CheckNetworkConnection checkNetworkConnection;
     // key which is used to save instance for the review list
     private String LIST_REVIEW = "list_review";
     // key which is used to pass into the Bundle when the Activity send data to this fragment
@@ -181,7 +179,6 @@ public class DetailFragment extends Fragment {
         View view = inflater.inflate(R.layout.detail_fragment_new, container, false);
 
         adapter = new ReviewAdapter(getContext(), new ArrayList<Review>());
-        checkNetworkConnection = new CheckNetworkConnection(getContext());
 
         // check saved state
         if (savedInstanceState != null) {
@@ -222,7 +219,7 @@ public class DetailFragment extends Fragment {
 
         if (checkHasValidMovie) {
             // if there is no internet connection, these codes can not be executed to get trailer link and review list
-            if (checkNetworkConnection.isNetworkAvailable()) {
+            if (Util.isNetworkAvailable(getContext())) {
                 GetJsonKeyTask_trailer task = new GetJsonKeyTask_trailer();
                 task.execute(String.valueOf(movie.getId()));
 
@@ -239,7 +236,7 @@ public class DetailFragment extends Fragment {
         super.onResume();
 
         if (checkHasValidMovie) {
-            if (checkNetworkConnection.isNetworkAvailable()) {
+            if (Util.isNetworkAvailable(getContext())) {
                 if (TrailerRequestURL == null) {
                     GetJsonKeyTask_trailer task = new GetJsonKeyTask_trailer();
                     task.execute(String.valueOf(movie.getId()));
@@ -255,7 +252,7 @@ public class DetailFragment extends Fragment {
     @OnClick(R.id.trailer_button)
     public void Trailer() {
         // if there is no internet connection, a Toast will appear to announce to users
-        if (checkNetworkConnection.isNetworkAvailable()) {
+        if (Util.isNetworkAvailable(getContext())) {
             if (TrailerRequestURL != null) {
                 Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(TrailerRequestURL));
 
@@ -273,7 +270,7 @@ public class DetailFragment extends Fragment {
     @OnClick(R.id.review_button)
     public void Reviews() {
 
-        if (!checkNetworkConnection.isNetworkAvailable() && review_list.size() == 0) {
+        if (!Util.isNetworkAvailable(getContext()) && review_list.size() == 0) {
             Toast.makeText(getContext(), "No internet connection", Toast.LENGTH_SHORT).show();
         } else {
             showReviewDialog();
@@ -400,7 +397,7 @@ public class DetailFragment extends Fragment {
         //progressBar.setVisibility(View.VISIBLE);
         progressBar.setProgress(0);
 
-        if (checkNetworkConnection.isNetworkAvailable()) {
+        if (Util.isNetworkAvailable(getContext())) {
 
             review_list.clear();
 
@@ -471,13 +468,11 @@ public class DetailFragment extends Fragment {
 
             HttpURLConnection urlConnection_trailer = null;
             BufferedReader reader_trailer = null;
-
             String jSonString_trailer = null;
 
             try {
 
                 URL url_trailer = new URL("http://api.themoviedb.org/3/movie/" + params[0] + "/videos?api_key=" + BuildConfig.OPEN_API);
-                //Log.i("API", url_trailer.toString());
 
                 urlConnection_trailer = (HttpURLConnection) url_trailer.openConnection();
                 urlConnection_trailer.setRequestMethod("GET");
@@ -490,17 +485,12 @@ public class DetailFragment extends Fragment {
                 }
 
                 reader_trailer = new BufferedReader(new InputStreamReader(inputStream_trailer));
-
                 String line;
-
                 StringBuilder builder = new StringBuilder();
-
                 while ((line = reader_trailer.readLine()) != null) {
                     builder.append(line + "\n");
                 }
-
                 jSonString_trailer = builder.toString();
-
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -515,7 +505,6 @@ public class DetailFragment extends Fragment {
                     }
                 }
             }
-
             return YoutubeRequest(GetTrailerKey(jSonString_trailer));
         }
 
@@ -533,28 +522,20 @@ public class DetailFragment extends Fragment {
 
     public class GetJsonKeyTask_reviews extends AsyncTask<String, Integer, ArrayList<Review>> {
 
-
         ProgressBar bar;
-
         public void setProgressBar(ProgressBar bar) {
             this.bar = bar;
         }
-
-
         // get an object Review through jsonString
-
         public ArrayList<Review> getReviewList(String json) {
 
             String LIST = "results";
             String AUTHOR = "author";
             String CONTENT = "content";
-
             ArrayList<Review> list = new ArrayList<>();
-
             try {
                 JSONObject reviews = new JSONObject(json);
                 JSONArray list_review = reviews.getJSONArray(LIST);
-
                 if (list_review.length() != 0) {
                     for (int i = 0; i < list_review.length(); i++) {
                         Review review = new Review();
@@ -572,15 +553,11 @@ public class DetailFragment extends Fragment {
 
                     list.add(review);
                 }
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
             return list;
         }
-
-
         // return arraylist<Review>
 
         @Override
@@ -588,33 +565,25 @@ public class DetailFragment extends Fragment {
 
             HttpURLConnection urlConnection_review = null;
             BufferedReader reader_review = null;
-
             String jSonString_review = null;
-
             try {
-
                 URL url_review = new URL("https://api.themoviedb.org/3/movie/" + params[0] + "/reviews?api_key=" + BuildConfig.OPEN_API);
                 urlConnection_review = (HttpURLConnection) url_review.openConnection();
                 urlConnection_review.setRequestMethod("GET");
                 urlConnection_review.connect();
 
                 InputStream inputStream_review = urlConnection_review.getInputStream();
-
                 if (inputStream_review == null) {
                     // do nothing here
                 }
-
                 reader_review = new BufferedReader(new InputStreamReader(inputStream_review));
 
                 String line;
                 StringBuilder builder = new StringBuilder();
-
                 while ((line = reader_review.readLine()) != null) {
                     builder.append(line + "\n");
                 }
-
                 jSonString_review = builder.toString();
-
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -629,14 +598,12 @@ public class DetailFragment extends Fragment {
                     }
                 }
             }
-
             return getReviewList(jSonString_review);
         }
 
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-
             if (this.bar != null) {
                 bar.setProgress(values[0]);
             }
@@ -645,9 +612,7 @@ public class DetailFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<Review> reviews) {
             super.onPostExecute(reviews);
-
             review_list = reviews;
-
             if (reviews != null) {
                 adapter.clear();
                 adapter.addAll(reviews);

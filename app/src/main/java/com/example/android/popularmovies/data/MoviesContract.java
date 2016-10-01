@@ -1,4 +1,4 @@
-package com.example.android.popularmovies.data;
+package com.example.android.popularmovies.Data;
 
 import android.content.ContentResolver;
 import android.net.Uri;

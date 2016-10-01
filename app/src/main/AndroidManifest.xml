@@ -11,7 +11,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.MainActivity">
+        <activity android:name=".UI.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,22 +19,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.DetailActivity"
-            android:parentActivityName=".Activities.MainActivity"
+            android:name=".UI.DetailActivity"
+            android:parentActivityName=".UI.MainActivity"
             android:theme="@style/DetailTheme"></activity>
 
         <provider
-            android:name=".data.MovieProvider"
+            android:name=".Data.MovieProvider"
             android:authorities="com.example.android.popularmovies" />
 
         <activity
-            android:name=".Activities.FavoriteMoviesActivity"
+            android:name=".UI.FavoriteMoviesActivity"
             android:label="Favorite Movies"
-            android:parentActivityName=".Activities.MainActivity"></activity>
+            android:parentActivityName=".UI.MainActivity"></activity>
 
-        <service android:name=".service.FetchMoviesService" />
+        <service android:name=".Services.FetchMoviesService" />
 
-        <service android:name=".service.FetchUpComingMoviesService" />
+        <service android:name=".Services.FetchUpComingMoviesService" />
+
+        <service android:name=".Services.FetchSearchMovies" />
 
     </application>
 

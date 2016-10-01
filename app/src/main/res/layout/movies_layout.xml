@@ -4,9 +4,9 @@
     android:layout_height="match_parent"
     android:background="@color/grey_200"
     android:nestedScrollingEnabled="false"
-    tools:context=".Activities.MainActivity">
+    tools:context=".UI.MainActivity">
 
-    <com.example.android.popularmovies.Activities.CustomSwipeRefreshLayout
+    <com.example.android.popularmovies.UI.CustomSwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,6 +19,6 @@
             android:numColumns="1"
             android:dividerHeight="1dp"></ListView>
 
-    </com.example.android.popularmovies.Activities.CustomSwipeRefreshLayout>
+    </com.example.android.popularmovies.UI.CustomSwipeRefreshLayout>
 
 </RelativeLayout>

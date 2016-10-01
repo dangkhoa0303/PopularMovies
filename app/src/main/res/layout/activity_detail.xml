@@ -3,4 +3,4 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/movie_detail_container"
-    tools:context="com.example.android.popularmovies.Activities.DetailActivity" />
+    tools:context="com.example.android.popularmovies.UI.DetailActivity" />

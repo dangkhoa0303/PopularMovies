@@ -1,4 +1,4 @@
-package com.example.android.popularmovies.data;
+package com.example.android.popularmovies.Data;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-import com.example.android.popularmovies.data.MoviesContract.Movies;
+import com.example.android.popularmovies.Data.MoviesContract.Movies;
 
 /**
  * Created by Dell on 11/30/2015.
@@ -20,9 +20,9 @@ public class MovieProvider extends ContentProvider {
     private static final int MOVIE_WITH_TITLE = 101;
     private static final int MOVIE_WITH_MOVIE_ID = 102;
     private static MoviesDB mOpenHelper;
-    private static UriMatcher sURiMatcher = builURiMatcher();
+    private static UriMatcher sURiMatcher = buildURiMatcher();
 
-    static UriMatcher builURiMatcher() {
+    static UriMatcher buildURiMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
         final String authority = MoviesContract.CONTENT_AUTHORITY; // com.example.android.popularmovies

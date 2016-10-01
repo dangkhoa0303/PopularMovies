@@ -1,4 +1,4 @@
-package com.example.android.popularmovies.Activities;
+package com.example.android.popularmovies.UI;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -11,9 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -23,7 +20,7 @@ import com.example.android.popularmovies.Adapters.MoviesAdapter;
 import com.example.android.popularmovies.Properties.MovieProperties;
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.Util;
-import com.example.android.popularmovies.service.FetchMoviesService;
+import com.example.android.popularmovies.Services.FetchMoviesService;
 
 import java.util.ArrayList;
 
@@ -75,7 +72,7 @@ public class MostPopularMoviesFragment extends Fragment {
         } else {
             list_movie = new ArrayList<>();
         }
-        setHasOptionsMenu(true);
+        //setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -116,17 +113,6 @@ public class MostPopularMoviesFragment extends Fragment {
         super.onDestroy();
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        //inflater.inflate(R.menu.menu_movies_fragment, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
-
     public void refresh(String type) {
         if (!Util.isNetworkAvailable(getContext())) {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
@@ -139,6 +125,7 @@ public class MostPopularMoviesFragment extends Fragment {
                         }
                     })
                     .show();
+            mSwipeRefreshLayout.setRefreshing(false);
         } else {
             mSwipeRefreshLayout.setRefreshing(true);
             Intent intent = new Intent(getActivity(), FetchMoviesService.class);

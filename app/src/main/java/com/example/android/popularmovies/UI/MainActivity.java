@@ -1,28 +1,45 @@
-package com.example.android.popularmovies.Activities;
+package com.example.android.popularmovies.UI;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.android.popularmovies.Adapters.PagerAdapter;
 import com.example.android.popularmovies.Properties.MovieProperties;
 import com.example.android.popularmovies.R;
+import com.example.android.popularmovies.Services.FetchSearchMovies;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MostPopularMoviesFragment.PopularMoviesCallBack,
-        UpComingMoviesFragment.UpComingMoviesCallBack, FavoriteMoviesFragment.FavoriteMoviesCallBack {
-    //    private static final String DETAIL_FRAGMENT_TAG = "DFTAG";
+        UpComingMoviesFragment.UpComingMoviesCallBack, FavoriteMoviesFragment.FavoriteMoviesCallBack, SearchView.OnQueryTextListener {
+
+//    private static final String DETAIL_FRAGMENT_TAG = "DFTAG";
 //    private static String DETAIL_TAG = "favorite_movie_detail";
 //    private boolean mTwoPane;
     public static String parcelable = "Movie_Package_Intent", transpackage = "Package";
+    private SearchMoviesReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        IntentFilter intentFilter = new IntentFilter(SearchMoviesReceiver.SEARCH_MOVIES_LIST_RECEIVER);
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        receiver = new SearchMoviesReceiver();
+        registerReceiver(receiver, intentFilter);
+
 //        setContentView(R.layout.activity_main);
 //        if (findViewById(R.id.movie_detail_container) != null) {
 //            mTwoPane = true;
@@ -73,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements MostPopularMovies
                         break;
                     default:
                         title = null;
+                        break;
                 }
                 toolbar.setTitle(title);
             }
@@ -101,18 +119,26 @@ public class MainActivity extends AppCompatActivity implements MostPopularMovies
     }
 
     @Override
+    protected void onDestroy() {
+        unregisterReceiver(receiver);
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+
+        searchView.setOnQueryTextListener(this);
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//        if (id == R.id.favorite_movies) {
-//            Intent intent = new Intent(this, FavoriteMoviesActivity.class);
-//            startActivity(intent);
-//        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -194,5 +220,28 @@ public class MainActivity extends AppCompatActivity implements MostPopularMovies
         bundle.putParcelable(parcelable, movie);
         intent.putExtra(transpackage, bundle);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        Intent intent = new Intent(this, FetchSearchMovies.class);
+        intent.putExtra(FetchSearchMovies.SEARCH, query);
+        startService(intent);
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
+    }
+
+    public class SearchMoviesReceiver extends BroadcastReceiver {
+        public static final String SEARCH_MOVIES_LIST_RECEIVER = "com.example.android.searchmovies";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ArrayList<MovieProperties> list = intent.getParcelableArrayListExtra(FetchSearchMovies.KEY_RESPONSE_SEARCH);
+            Toast.makeText(getApplicationContext(), ""+list.size(), Toast.LENGTH_SHORT).show();
+        }
     }
 }

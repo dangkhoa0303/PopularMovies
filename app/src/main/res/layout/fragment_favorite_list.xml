@@ -2,7 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".Activities.FavoriteMoviesActivity">
+    tools:context=".UI.FavoriteMoviesActivity">
 
     <ListView
         android:id="@+id/listView_favorite_movie"

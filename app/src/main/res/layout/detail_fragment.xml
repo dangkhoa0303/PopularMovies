@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="5dp"
     android:orientation="vertical"
-    tools:context=".Activities.DetailActivity">
+    tools:context=".UI.DetailActivity">
 
     <ScrollView
         android:id="@+id/scrollView_root_layout"

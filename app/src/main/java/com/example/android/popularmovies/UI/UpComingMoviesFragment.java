@@ -1,4 +1,4 @@
-package com.example.android.popularmovies.Activities;
+package com.example.android.popularmovies.UI;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -20,7 +20,7 @@ import com.example.android.popularmovies.Adapters.MoviesAdapter;
 import com.example.android.popularmovies.Properties.MovieProperties;
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.Util;
-import com.example.android.popularmovies.service.FetchUpComingMoviesService;
+import com.example.android.popularmovies.Services.FetchUpComingMoviesService;
 
 import java.util.ArrayList;
 
@@ -68,7 +68,7 @@ public class UpComingMoviesFragment extends Fragment {
         } else {
             list_movie = new ArrayList<>();
         }
-        setHasOptionsMenu(true);
+        //setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -121,6 +121,7 @@ public class UpComingMoviesFragment extends Fragment {
                         }
                     })
                     .show();
+            mSwipeRefreshLayout.setRefreshing(false);
         } else {
             mSwipeRefreshLayout.setRefreshing(true);
             Intent intent = new Intent(getActivity(), FetchUpComingMoviesService.class);

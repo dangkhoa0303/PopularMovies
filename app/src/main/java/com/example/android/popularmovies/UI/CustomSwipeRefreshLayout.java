@@ -1,9 +1,8 @@
-package com.example.android.popularmovies.Activities;
+package com.example.android.popularmovies.UI;
 
 import android.content.Context;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
-import android.widget.GridView;
 import android.widget.ListView;
 
 /**

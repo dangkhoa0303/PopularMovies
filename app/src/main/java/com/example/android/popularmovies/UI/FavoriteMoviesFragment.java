@@ -1,4 +1,4 @@
-package com.example.android.popularmovies.Activities;
+package com.example.android.popularmovies.UI;
 
 import android.database.Cursor;
 import android.net.Uri;
@@ -17,7 +17,7 @@ import android.widget.ListView;
 import com.example.android.popularmovies.Adapters.FavoriteAdapter;
 import com.example.android.popularmovies.Properties.MovieProperties;
 import com.example.android.popularmovies.R;
-import com.example.android.popularmovies.data.MoviesContract;
+import com.example.android.popularmovies.Data.MoviesContract;
 
 /**
  * Created by Dell on 12/8/2015.
@@ -83,7 +83,6 @@ public class FavoriteMoviesFragment extends Fragment implements LoaderManager.Lo
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
-
                 if (cursor != null) {
                     MovieProperties movieProperties = new MovieProperties();
                     movieProperties.setId(cursor.getInt(cursor.getColumnIndex(MoviesContract.Movies.MOVIE_ID)));
@@ -114,9 +113,7 @@ public class FavoriteMoviesFragment extends Fragment implements LoaderManager.Lo
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
         String sortOrder = MoviesContract.Movies.VOTE_AVERAGE + " DESC";
-
         return new CursorLoader(getActivity(),
                 authority,
                 CURSOR_COLUMNS,
@@ -128,9 +125,7 @@ public class FavoriteMoviesFragment extends Fragment implements LoaderManager.Lo
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
         mAdapter.swapCursor(data);
-
         if (mPosition != ListView.INVALID_POSITION) {
             mlistView.smoothScrollToPosition(mPosition);
         }
