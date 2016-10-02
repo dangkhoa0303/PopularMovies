@@ -7,6 +7,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -32,18 +36,13 @@ public class SearchResultsActivity extends AppCompatActivity {
     private ArrayList<MovieProperties> list;
     private MoviesAdapter adapter;
 
+    private static String SAVE_LIST = "save list";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_search_results);
-        list = new ArrayList<>();
-        adapter = new MoviesAdapter(this, new ArrayList<MovieProperties>(), MoviesAdapter.SEARCH_MOVIES_ITEM);
-
-        IntentFilter intentFilter = new IntentFilter(SearchMoviesReceiver.SEARCH_MOVIES_LIST_RECEIVER);
-        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
-        receiver = new SearchMoviesReceiver();
-        registerReceiver(receiver, intentFilter);
-
         toolbar = (Toolbar) findViewById(R.id.toolBarResults);
         setSupportActionBar(toolbar);
 
@@ -55,12 +54,32 @@ public class SearchResultsActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             query = intent.getStringExtra(SearchManager.QUERY);
-            search(query);
         } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             query = intent.getDataString();
         }
-        toolbar.setTitle(query);
 
+        adapter = new MoviesAdapter(this, new ArrayList<MovieProperties>(), MoviesAdapter.SEARCH_MOVIES_ITEM);
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SAVE_LIST)) {
+            list = savedInstanceState.getParcelableArrayList(SAVE_LIST);
+            updateUI(list);
+        } else {
+            list = new ArrayList<>();
+            search(query);
+        }
+
+        IntentFilter intentFilter = new IntentFilter(SearchMoviesReceiver.SEARCH_MOVIES_LIST_RECEIVER);
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        receiver = new SearchMoviesReceiver();
+        registerReceiver(receiver, intentFilter);
+
+        toolbar.setTitle(query);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(SAVE_LIST, list);
     }
 
     @Override

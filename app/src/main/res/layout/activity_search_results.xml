@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         android:background="@color/colorPrimary"
+        android:elevation="4dp"
         app:navigationIcon="@drawable/arrow_left"
         app:title="@string/search"
         app:titleTextColor="@color/white"></android.support.v7.widget.Toolbar>
@@ -22,14 +23,14 @@
         android:layout_height="match_parent"
         android:layout_below="@id/toolBarResults"
         android:background="@color/grey_200"
-        android:padding="16dp"></ListView>
+        android:padding="8dp"></ListView>
 
     <ProgressBar
         android:id="@+id/progressBarResults"
-        style="?android:attr/progressBarStyleInverse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:progressBackgroundTint="@color/blue" />
+        android:progressBackgroundTint="@color/blue"
+        android:progressTint="@color/blue" />
 
 </RelativeLayout>
