@@ -39,9 +39,9 @@ public class UpComingMoviesFragment extends Fragment {
 
     private NewMoviesServiceReceiver receiver;
 
-    public interface UpComingMoviesCallBack {
-        void onUpComingMoviesItemSelected(MovieProperties movie);
-    }
+//    public interface UpComingMoviesCallBack {
+//        void onUpComingMoviesItemSelected(MovieProperties movie);
+//    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -87,13 +87,13 @@ public class UpComingMoviesFragment extends Fragment {
                 refresh(type);
             }
         });
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ((UpComingMoviesCallBack) getActivity())
-                        .onUpComingMoviesItemSelected(list_movie.get(position));
-            }
-        });
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                ((UpComingMoviesCallBack) getActivity())
+//                        .onUpComingMoviesItemSelected(list_movie.get(position));
+//            }
+//        });
         if (list_movie.size() == 0 && savedInstanceState == null) {
             type = up_coming_movies;
             refresh(type);

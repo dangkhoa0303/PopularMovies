@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.android.popularmovies.Adapters.MoviesAdapter;
 import com.example.android.popularmovies.Properties.MovieProperties;
@@ -42,10 +43,6 @@ public class MostPopularMoviesFragment extends Fragment {
     private static String TYPE = "USER_CHOOSING_TYPE";
 
     private PopularMoviesServiceReceiver receiver;
-
-    public interface PopularMoviesCallBack {
-        void onPopularMoviesItemSelected(MovieProperties movie);
-    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -88,18 +85,13 @@ public class MostPopularMoviesFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                mSwipeRefreshLayout.setRefreshing(true);
                 refresh(type);
-            }
-        });
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ((PopularMoviesCallBack) getActivity())
-                        .onPopularMoviesItemSelected(list_movie.get(position));
             }
         });
         if (list_movie.size() == 0 && savedInstanceState == null) {
             type = sort_by_popularity;
+            mSwipeRefreshLayout.setRefreshing(true);
             refresh(type);
         } else {
             updateUI(list_movie, adapter);
@@ -113,7 +105,7 @@ public class MostPopularMoviesFragment extends Fragment {
         super.onDestroy();
     }
 
-    public void refresh(String type) {
+    private void refresh(String type) {
         if (!Util.isNetworkAvailable(getContext())) {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
             alertDialog

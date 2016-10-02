@@ -21,4 +21,6 @@
 
     <string name="search">Search</string>
     <string name="hint_search">Search movies</string>
+
+    <string name="transition">image transition</string>
 </resources>

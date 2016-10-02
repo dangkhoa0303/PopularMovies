@@ -1,6 +1,11 @@
 package com.example.android.popularmovies.Adapters;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
@@ -12,6 +17,8 @@ import android.widget.TextView;
 
 import com.example.android.popularmovies.Properties.MovieProperties;
 import com.example.android.popularmovies.R;
+import com.example.android.popularmovies.UI.DetailActivity;
+import com.example.android.popularmovies.UI.MainActivity;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
@@ -38,15 +45,9 @@ public class MoviesAdapter extends ArrayAdapter {
         this.TYPE_VIEW = TYPE_VIEW;
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         int type = 0;
         if (convertView == null) {
-//            if (position == 0) {
-//                convertView = LayoutInflater.from(this.context).inflate(R.layout.list_movie_item_special, parent, false);
-//            } else {
-//                convertView = LayoutInflater.from(this.context).inflate(R.layout.list_movie_item, parent, false);
-//            }
-//            convertView = LayoutInflater.from(this.context).inflate(R.layout.list_movie_item, parent, false);
             switch(TYPE_VIEW) {
                 case POPULAR_MOVIES_ITEM:
                     type = R.layout.list_movie_item;
@@ -62,9 +63,9 @@ public class MoviesAdapter extends ArrayAdapter {
             }
             convertView = LayoutInflater.from(this.context).inflate(type, parent, false);
         }
-
-        ImageView thumbnail = (ImageView) convertView.findViewById(R.id.item_movie_thumbnail);
+        final ImageView thumbnail = (ImageView) convertView.findViewById(R.id.item_movie_thumbnail);
         TextView title = (TextView) convertView.findViewById(R.id.item_movie_title);
+        TextView releaseDate = (TextView) convertView.findViewById(R.id.item_movie_release_date);
         TextView review = (TextView) convertView.findViewById(R.id.item_movie_review);
         TextView summary = (TextView) convertView.findViewById(R.id.item_movie_summary);
 
@@ -74,9 +75,28 @@ public class MoviesAdapter extends ArrayAdapter {
                 .into(thumbnail);
 
         title.setText(movies.get(position).getTitle());
-        review.setText(movies.get(position).getVote_average() + "/10.0");
+        releaseDate.setText("Release date: " + movies.get(position).getRelease_date());
+        review.setText("Vote: " + movies.get(position).getVote_average() + "/10.0");
         summary.setText(movies.get(position).getOverview());
 
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(context, DetailActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(MainActivity.parcelable, movies.get(position));
+                i.putExtra(MainActivity.transpackage, bundle);
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context, thumbnail, thumbnail.getTransitionName());
+                    ((Activity) context).getWindow().setSharedElementEnterTransition(TransitionInflater.from(context).inflateTransition(R.transition.curve));
+                    context.startActivity(i, options.toBundle());
+                } else {
+                    context.startActivity(i);
+                }
+            }
+        });
         return convertView;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.android.popularmovies.UI;
 
+import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -18,10 +19,10 @@ import com.example.android.popularmovies.Adapters.PagerAdapter;
 import com.example.android.popularmovies.Properties.MovieProperties;
 import com.example.android.popularmovies.R;
 
-public class MainActivity extends AppCompatActivity implements MostPopularMoviesFragment.PopularMoviesCallBack,
-        UpComingMoviesFragment.UpComingMoviesCallBack, FavoriteMoviesFragment.FavoriteMoviesCallBack, SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements FavoriteMoviesFragment.FavoriteMoviesCallBack, SearchView.OnQueryTextListener {
 
     private Toolbar toolbar;
+    private SearchView searchView;
 
 //    private static final String DETAIL_FRAGMENT_TAG = "DFTAG";
 //    private static String DETAIL_TAG = "favorite_movie_detail";
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements MostPopularMovies
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         MenuItem searchItem = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(this);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -131,58 +132,6 @@ public class MainActivity extends AppCompatActivity implements MostPopularMovies
     public boolean onOptionsItemSelected(MenuItem item) {
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onPopularMoviesItemSelected(MovieProperties movie) {
-//        if (mTwoPane) {
-//            Bundle args = new Bundle();
-//            args.putParcelable(DetailFragment.PACKAGE, movie);
-//
-//            DetailFragment fragment = new DetailFragment();
-//            fragment.setArguments(args);
-//
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.movie_detail_container, fragment, DETAIL_FRAGMENT_TAG)
-//                    .commit();
-//        } else {
-//            Intent i = new Intent(this, DetailActivity.class);
-//            Bundle bundle = new Bundle();
-//            bundle.putParcelable("Movie_Package_Intent", movie);
-//            i.putExtra("Package", bundle);
-//            startActivity(i);
-//        }
-        Intent i = new Intent(this, DetailActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(parcelable, movie);
-        i.putExtra(transpackage, bundle);
-        startActivity(i);
-    }
-
-    @Override
-    public void onUpComingMoviesItemSelected(MovieProperties movie) {
-//        if (mTwoPane) {
-//            Bundle args = new Bundle();
-//            args.putParcelable(DetailFragment.PACKAGE, movie);
-//
-//            DetailFragment fragment = new DetailFragment();
-//            fragment.setArguments(args);
-//
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.movie_detail_container, fragment, DETAIL_FRAGMENT_TAG)
-//                    .commit();
-//        } else {
-//            Intent i = new Intent(this, DetailActivity.class);
-//            Bundle bundle = new Bundle();
-//            bundle.putParcelable("Movie_Package_Intent", movie);
-//            i.putExtra("Package", bundle);
-//            startActivity(i);
-//        }
-        Intent i = new Intent(this, DetailActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(parcelable, movie);
-        i.putExtra(transpackage, bundle);
-        startActivity(i);
     }
 
     @Override
@@ -221,5 +170,14 @@ public class MainActivity extends AppCompatActivity implements MostPopularMovies
     @Override
     public boolean onQueryTextChange(String newText) {
         return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!searchView.isIconified()) {
+            searchView.setIconified(true);
+        } else {
+            super.onBackPressed();
+        }
     }
 }

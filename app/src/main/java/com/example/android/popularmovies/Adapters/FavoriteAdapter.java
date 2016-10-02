@@ -21,9 +21,7 @@ import butterknife.InjectView;
  */
 public class FavoriteAdapter extends CursorAdapter {
 
-
     public static class ViewHolder {
-
         @InjectView(R.id.poster_imageView)
         public ImageView poster_image;
         @InjectView(R.id.movie_title)
@@ -34,9 +32,7 @@ public class FavoriteAdapter extends CursorAdapter {
         public TextView vote_average_text;
 
         public ViewHolder(View view) {
-
             ButterKnife.inject(this, view);
-
         }
     }
 
@@ -46,22 +42,16 @@ public class FavoriteAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-
         View view = LayoutInflater.from(context).inflate(R.layout.list_favorite_movie_item, parent, false);
-
         ViewHolder viewHolder = new ViewHolder(view);
-
         // set tag for viewHolder in order to use it in the another method - bindView
         view.setTag(viewHolder);
-
         return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-
         String poster_path = cursor.getString(FavoriteMoviesFragment.COL_BACKDROP_PATH);
         Picasso.with(context)
                 .load(poster_path)
@@ -77,6 +67,5 @@ public class FavoriteAdapter extends CursorAdapter {
 
         String vote_average = cursor.getString(FavoriteMoviesFragment.COL_VOTE_AVERAGE);
         viewHolder.vote_average_text.setText(vote_average + "/10.0");
-
     }
 }
