@@ -25,20 +25,42 @@ public class MoviesAdapter extends ArrayAdapter {
 
     private Context context;
     private ArrayList<MovieProperties> movies;
+    private int TYPE_VIEW;
 
-    public MoviesAdapter(Context context, ArrayList<MovieProperties> movies) {
+    public static final int POPULAR_MOVIES_ITEM = 100;
+    public static final int UPCOMING_MOVIES_ITEM = 102;
+    public static final int SEARCH_MOVIES_ITEM = 104;
+
+    public MoviesAdapter(Context context, ArrayList<MovieProperties> movies, int TYPE_VIEW) {
         super(context, R.layout.list_movie_item, movies);
         this.context = context;
         this.movies = movies;
+        this.TYPE_VIEW = TYPE_VIEW;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
+        int type = 0;
         if (convertView == null) {
-            if (position == 0) {
-                convertView = LayoutInflater.from(this.context).inflate(R.layout.list_movie_item_special, parent, false);
-            } else {
-                convertView = LayoutInflater.from(this.context).inflate(R.layout.list_movie_item, parent, false);
+//            if (position == 0) {
+//                convertView = LayoutInflater.from(this.context).inflate(R.layout.list_movie_item_special, parent, false);
+//            } else {
+//                convertView = LayoutInflater.from(this.context).inflate(R.layout.list_movie_item, parent, false);
+//            }
+//            convertView = LayoutInflater.from(this.context).inflate(R.layout.list_movie_item, parent, false);
+            switch(TYPE_VIEW) {
+                case POPULAR_MOVIES_ITEM:
+                    type = R.layout.list_movie_item;
+                    break;
+                case UPCOMING_MOVIES_ITEM:
+                    type = R.layout.list_movie_item_special;
+                    break;
+                case SEARCH_MOVIES_ITEM:
+                    type = R.layout.list_movie_item_special;
+                    break;
+                default:
+                    type = R.layout.list_movie_item;
             }
+            convertView = LayoutInflater.from(this.context).inflate(type, parent, false);
         }
 
         ImageView thumbnail = (ImageView) convertView.findViewById(R.id.item_movie_thumbnail);

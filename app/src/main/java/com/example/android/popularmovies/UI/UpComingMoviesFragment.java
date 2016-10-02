@@ -60,7 +60,7 @@ public class UpComingMoviesFragment extends Fragment {
         getContext().registerReceiver(receiver, intentFilter);
 
         // if don't initialize adapter in onCreate, all the methods relating to adapter will cause error because if null object (adapter)
-        adapter = new MoviesAdapter(getActivity(), new ArrayList<MovieProperties>());
+        adapter = new MoviesAdapter(getActivity(), new ArrayList<MovieProperties>(), MoviesAdapter.UPCOMING_MOVIES_ITEM);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(MOVIE_KEY)) {
             list_movie = savedInstanceState.getParcelableArrayList(MOVIE_KEY);

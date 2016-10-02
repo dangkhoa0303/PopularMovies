@@ -8,6 +8,7 @@ import android.util.Log;
 import com.example.android.popularmovies.UI.MainActivity;
 import com.example.android.popularmovies.BuildConfig;
 import com.example.android.popularmovies.Properties.MovieProperties;
+import com.example.android.popularmovies.UI.SearchResultsActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,8 +55,6 @@ public class FetchSearchMovies extends IntentService {
                     .appendQueryParameter(QUERY, search)
                     .build();
 
-            Log.i("http", uriBuilder.toString());
-
             URL url = new URL(uriBuilder.toString());
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setRequestMethod("GET");
@@ -96,7 +95,7 @@ public class FetchSearchMovies extends IntentService {
 
         Intent broadcastIntent = new Intent();
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.setAction(MainActivity.SearchMoviesReceiver.SEARCH_MOVIES_LIST_RECEIVER);
+        broadcastIntent.setAction(SearchResultsActivity.SearchMoviesReceiver.SEARCH_MOVIES_LIST_RECEIVER);
         broadcastIntent.putParcelableArrayListExtra(KEY_RESPONSE_SEARCH, list);
         sendBroadcast(broadcastIntent);
     }
